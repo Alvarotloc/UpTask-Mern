@@ -1,6 +1,13 @@
 import express from 'express'
+import dotenv from 'dotenv'
+
+import conectarDB from './config/dbconfig.js'
 
 const app = express()
+
+dotenv.config()
+
+conectarDB()
 
 app.get('/', (req, res) => {
   res.send('hola')
