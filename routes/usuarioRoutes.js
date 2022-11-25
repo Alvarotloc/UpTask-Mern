@@ -3,7 +3,10 @@ import express from 'express'
 import {
   registrarUsuario,
   autenticarUsuario,
-  confirmarUsuario
+  confirmarUsuario,
+  recuperarPassword,
+  comprobarToken,
+  nuevoPassword
 } from '../controllers/usuarioController.js'
 
 const router = express.Router()
@@ -14,5 +17,11 @@ router.post('/', registrarUsuario)
 router.post('/login', autenticarUsuario)
 
 router.get('/confirmar/:token', confirmarUsuario)
+
+router.post('/recuperar-password', recuperarPassword)
+
+router.route('/recuperar-password/:token')
+  .get(comprobarToken)
+  .post(nuevoPassword)
 
 export default router

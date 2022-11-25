@@ -1,5 +1,6 @@
 import { generarId } from '../helpers/generarId.js'
 import { generarJWT } from '../helpers/generarJWT.js'
+import { emailOlvidePassword } from '../helpers/sendEmails.js'
 import Usuario from '../models/Usuario.js'
 
 const registrarUsuario = async (req, res) => {
@@ -63,8 +64,74 @@ const confirmarUsuario = async (req, res) => {
   }
 }
 
+const recuperarPassword = async (req, res) => {
+  const { email } = req.body
+
+  const usuario = await Usuario.findOne({ email })
+  if (!usuario) {
+    const error = new Error('No existe ningún usuario con ese email')
+    return res.status(404).json({ msg: error.message })
+  }
+  if (!usuario.confirmado) {
+    const error = new Error('Primero debes confirmar la cuenta')
+    return res.status(403).json({ msg: error.message })
+  }
+  try {
+    usuario.token = generarId()
+    await usuario.save()
+
+    emailOlvidePassword({
+      email,
+      nombre: usuario.nombre,
+      token: usuario.token
+    })
+    res.json({ msg: 'Hemos enviado un email para reestablecer la contraseña' })
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+const comprobarToken = async (req, res) => {
+  const { token } = req.params
+  const usuario = await Usuario.findOne({ token })
+
+  if (!usuario) {
+    const error = new Error('El token no existe o a expirado')
+    return res.status(404).json({ msg: error.message })
+  }
+  if (!usuario.confirmado) {
+    const error = new Error('Primero debes confirmar la cuenta')
+    return res.status(403).json({ msg: error.message })
+  }
+  res.json({ msg: 'Token valido y el usuario existe' })
+}
+
+const nuevoPassword = async (req, res) => {
+  const { token } = req.params
+  const { password } = req.body
+
+  const usuario = await Usuario.findOne({ token })
+
+  if (!usuario) {
+    const error = new Error('El token no existe o a expirado')
+    return res.status(404).json({ msg: error.message })
+  }
+  if (!usuario.confirmado) {
+    const error = new Error('Primero debes confirmar la cuenta')
+    return res.status(403).json({ msg: error.message })
+  }
+
+  usuario.password = password
+  usuario.token = ''
+  await usuario.save()
+  res.json({ msg: 'Contraseña modificada con éxito' })
+}
+
 export {
   registrarUsuario,
   autenticarUsuario,
-  confirmarUsuario
+  confirmarUsuario,
+  recuperarPassword,
+  comprobarToken,
+  nuevoPassword
 }
