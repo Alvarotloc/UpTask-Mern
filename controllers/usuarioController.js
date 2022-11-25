@@ -45,7 +45,26 @@ const autenticarUsuario = async (req, res) => {
   })
 }
 
+const confirmarUsuario = async (req, res) => {
+  const { token } = req.params
+  const usuario = await Usuario.findOne({ token })
+  if (!usuario) {
+    const error = new Error('El token no existe o ya ha expirado')
+    return res.status(404).json({ msg: error.message })
+  }
+  try {
+    usuario.confirmado = true
+    usuario.token = ''
+    await usuario.save()
+
+    return res.json({ msg: 'Usuario confirmado con éxito' })
+  } catch (error) {
+    console.log(error)
+  }
+}
+
 export {
   registrarUsuario,
-  autenticarUsuario
+  autenticarUsuario,
+  confirmarUsuario
 }
