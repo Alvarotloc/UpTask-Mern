@@ -6,8 +6,10 @@ import {
   confirmarUsuario,
   recuperarPassword,
   comprobarToken,
-  nuevoPassword
+  nuevoPassword,
+  perfil
 } from '../controllers/usuarioController.js'
+import checkAuth from '../middlewares/checkAuth.js'
 
 const router = express.Router()
 
@@ -23,5 +25,7 @@ router.post('/recuperar-password', recuperarPassword)
 router.route('/recuperar-password/:token')
   .get(comprobarToken)
   .post(nuevoPassword)
+
+router.get('/perfil', checkAuth, perfil)
 
 export default router

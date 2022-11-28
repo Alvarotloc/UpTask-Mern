@@ -127,11 +127,17 @@ const nuevoPassword = async (req, res) => {
   res.json({ msg: 'Contraseña modificada con éxito' })
 }
 
+const perfil = async (req, res) => {
+  const { usuario } = req
+  res.json(usuario)
+}
+
 export {
   registrarUsuario,
   autenticarUsuario,
   confirmarUsuario,
   recuperarPassword,
   comprobarToken,
-  nuevoPassword
+  nuevoPassword,
+  perfil
 }
