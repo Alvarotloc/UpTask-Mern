@@ -1,4 +1,5 @@
 import Proyecto from '../models/Proyecto.js'
+import Tarea from '../models/Tarea.js'
 
 const obtenerProyectos = async (req, res) => {
   const { _id } = req.usuario
@@ -38,7 +39,13 @@ const obtenerProyecto = async (req, res) => {
     return res.status(403).json({ msg: error.message })
   }
 
-  res.json(proyecto)
+  // Obtener las tareas del proyecto
+  const tareas = await Tarea.find({ proyecto: proyecto.id })
+
+  res.json({
+    proyecto,
+    tareas
+  })
 //   try {
 //     const proyectoPorId = await Proyecto.find({ creador: _id, _id: id })
 //     res.json(proyectoPorId)
@@ -91,7 +98,7 @@ const eliminarProyecto = async (req, res) => {
   }
 
   try {
-    await proyecto.deleteOne(_id)
+    await proyecto.deleteOne()
     return res.json({ msg: 'Proyecto Eliminado' })
   } catch (error) {
     console.log(error)
@@ -103,9 +110,6 @@ const agregarColaborador = async (req, res) => {
 const eliminarColaborador = async (req, res) => {
 
 }
-const obtenerTareas = async (req, res) => {
-
-}
 
 export {
   obtenerProyectos,
@@ -114,6 +118,5 @@ export {
   editarProyecto,
   eliminarProyecto,
   agregarColaborador,
-  eliminarColaborador,
-  obtenerTareas
+  eliminarColaborador
 }
